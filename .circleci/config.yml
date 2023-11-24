@@ -19,12 +19,12 @@ jobs:
       - run:
           name: run lint
           command: |
-            . venv/bin/activate
+            source ~/.devops/bin/activate
             make lint
 
   docker-build:
     docker:
-      - image: circleci/python:3.7.3-stretch
+      - image: circleci/golang:1.15
     working_directory: ~/repo
     steps:
       - checkout
@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Build docker container
           command: |
-            docker build --tag=capstone_project .
+            docker build --tag=$DOCKER_IMAGE_NAME .
             # verify docker build
             docker image ls
       - run:
