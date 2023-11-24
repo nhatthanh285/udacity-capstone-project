@@ -149,7 +149,7 @@ jobs:
             - project/ansible/checkIfDeployed.txt
             - project/ansible/inventory.txt
 
-  onfigure-infrastructure:
+  configure-infrastructure:
     docker:
       - image: cimg/base:stable
     steps:
@@ -180,3 +180,4 @@ workflows:
       - test-build
       - docker-build-and-upload-to-dockerhub
       - deploy-infrastructure
+      - configure-infrastructure
