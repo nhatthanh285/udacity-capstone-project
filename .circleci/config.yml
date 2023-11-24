@@ -14,7 +14,7 @@ jobs:
           name: install dependencies
           command: |
             python3 -m venv ~/.devops
-            source .devops/bin/activate
+            source ~/.devops/bin/activate
             make install
       - run:
           name: run lint
@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Build docker container
           command: |
-            docker build --tag=capstone_project
+            docker build --tag=capstone_project .
             # verify docker build
             docker image ls
       - run:
