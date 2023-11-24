@@ -1,0 +1,14 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "CapstoneProject"
+	},
+    {
+		"ParameterKey": "KeyPairName",
+		"ParameterValue": "udacity_capstone"
+	},
+    {
+		"ParameterKey": "AMIImageId",
+		"ParameterValue": "ami-0fc5d935ebf8bc3bc"
+	}
+]
