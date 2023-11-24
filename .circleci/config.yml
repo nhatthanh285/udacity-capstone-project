@@ -48,3 +48,4 @@ workflows:
   default:
     jobs:
       - test-build
+      - docker-build
