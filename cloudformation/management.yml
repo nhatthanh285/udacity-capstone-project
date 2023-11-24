@@ -11,7 +11,7 @@ Parameters:
     Description: KeyPair Name
     Default: udacity_capstone
     Type: String
-  amiImageId:
+  AMIImageId:
     Description: Defines the Image-ID of the OS to deploy
     Default: InvalidAMIId
     Type: String
@@ -35,7 +35,7 @@ Resources:
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
-      ImageId: !Ref AMImageId
+      ImageId: !Ref AMIImageId
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management1
@@ -49,7 +49,7 @@ Resources:
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
-      ImageId: !Ref AMImageId
+      ImageId: !Ref AMIImageId
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management2
