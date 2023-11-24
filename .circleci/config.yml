@@ -68,3 +68,4 @@ workflows:
     jobs:
       - test-build
       - docker-build-and-upload-to-dockerhub
+      - deploy-infrastructure
