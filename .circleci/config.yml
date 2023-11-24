@@ -32,14 +32,14 @@ jobs:
           version: 20.10.17
           docker_layer_caching: true
       - run:
-        name: Build docker container
-        command: |
+          name: Build docker container
+          command: |
           docker build --tag=capstone_project
           # verify docker build
           docker image ls
       - run:
-        name: Upload Docker image to Dockerhub
-        command:
+          name: Upload Docker image to Dockerhub
+          command:
           echo $DOCKER_IMAGE_NAME
 
 
