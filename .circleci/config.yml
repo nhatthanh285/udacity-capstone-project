@@ -1,5 +1,38 @@
 version: 2.1
 
+commands:
+  install_awscli:
+    description: Install AWS CLI v2
+    steps:
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+
+  install-kubectl:
+    description: Install Kubectl
+    steps:
+      - run:
+          name: Install Kubectl
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+            kubectl version --client
+            export PATH=$PATH:/usr/local/bin/kubectl
+
 jobs:
   test-build:
     docker:
@@ -99,10 +132,47 @@ jobs:
               --output text >> ~/project/ansible/checkIfDeployed.txt
             cat ~/project/ansible/checkIfDeployed.txt
 
+      - run:
+          name: Extract the IPs of the management instances for Ansible
+          command: |
+            echo [management] > ~/project/ansible/inventory.txt
+            aws ec2 describe-instances \
+              --region "${AWS_DEFAULT_REGION}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
+              --output text >> ~/project/ansible/inventory.txt
+            cat ~/project/ansible/inventory.txt
+
       - persist_to_workspace:
           root: ~/
           paths:
             - project/ansible/checkIfDeployed.txt
+            - project/ansible/inventory.txt
+
+  onfigure-infrastructure:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_ansible
+      - install-kubectl
+      - add_ssh_keys:
+          fingerprints: [fe:98:81:45:ca:bc:c4:99:3a:37:3e:e9:7c:54:fa:9e]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Configure server
+          command: |
+            echo [management] > ~/project/ansible/inventory.txt
+            aws ec2 describe-instances \
+              --region "${AWS_DEFAULT_REGION}" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
+              --output text >> ~/project/ansible/inventory.txt
+            cat ~/project/ansible/inventory.txt
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-server.yml
+
 
 workflows:
   default:
