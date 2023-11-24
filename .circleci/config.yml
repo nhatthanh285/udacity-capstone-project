@@ -42,7 +42,7 @@ jobs:
           command:
             echo "Upload image $DOCKER_IMAGE_NAME to Dockerhub"
             docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$
+            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
             docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
 
   deploy-infrastructure:
@@ -53,6 +53,7 @@ jobs:
       - run:
           name: Install dependencies
           command: yum install -y tar gzip
+
       - run:
           name: Ensure EKS network exists
           command: |
@@ -62,6 +63,18 @@ jobs:
               --stack-name "${ENVIRONMENT_NAME}-eks-network" \
               --region ${AWS_DEFAULT_REGION} \
               --parameter-overrides file://cloudformation/network-params.json
+
+      - run:
+          name: Ensure EKS Cluster exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/cluster.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-cluster" \
+              --region ${AWS_DEFAULT_REGION} \
+              --parameter-overrides file://cloudformation/cluster-params.json \
+              --capabilities CAPABILITY_NAMED_IAM
+          no_output_timeout: 15m
 
 workflows:
   default:
