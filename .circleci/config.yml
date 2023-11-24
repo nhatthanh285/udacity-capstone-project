@@ -34,13 +34,13 @@ jobs:
       - run:
           name: Build docker container
           command: |
-          docker build --tag=capstone_project
-          # verify docker build
-          docker image ls
+            docker build --tag=capstone_project
+            # verify docker build
+            docker image ls
       - run:
           name: Upload Docker image to Dockerhub
           command:
-          echo $DOCKER_IMAGE_NAME
+            echo $DOCKER_IMAGE_NAME
 
 
 
