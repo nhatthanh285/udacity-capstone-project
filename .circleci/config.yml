@@ -76,7 +76,7 @@ jobs:
               --capabilities CAPABILITY_NAMED_IAM
           no_output_timeout: 15m
 
-       - run:
+      - run:
           name: Ensure Nodegroup exists
           command: |
             aws cloudformation deploy \
