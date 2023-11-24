@@ -1,5 +1,5 @@
 Description: >
-  Thanh Tran / Capstone Project
+  qdunggs95 / Capstone Project
   Creates two individual hosts to manage the EKS-Cluster
 
 Parameters:
@@ -7,9 +7,9 @@ Parameters:
     Description: An Environment name that will be prefixed to resources
     Default: capstone-project
     Type: String
-  SSHKeyName:
-    Description: SSH key for management access
-    Default: dungnq21Project5
+  KeyPairName:
+    Description: KeyPair Name
+    Default: udacity_capstone
     Type: String
   amiImageId:
     Description: Defines the Image-ID of the OS to deploy
@@ -35,7 +35,7 @@ Resources:
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
-      ImageId: !Ref AMIImageId
+      ImageId: !Ref amiImageId
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management1
@@ -49,7 +49,7 @@ Resources:
       SecurityGroups:
         - Ref: InstanceSecurityGroup
       KeyName: !Ref KeyPairName
-      ImageId: !Ref AMIImageId
+      ImageId: !Ref amiImageId
       Tags:
         - Key: Name
           Value: !Sub ${EnvironmentName}-management2
