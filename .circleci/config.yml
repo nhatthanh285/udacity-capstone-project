@@ -76,6 +76,17 @@ jobs:
               --capabilities CAPABILITY_NAMED_IAM
           no_output_timeout: 15m
 
+       - run:
+          name: Ensure Nodegroup exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/nodegroup.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-nodegroup" \
+              --region ${AWS_DEFAULT_REGION} \
+              --parameter-overrides file://cloudformation/nodegroup-params.json \
+              --capabilities CAPABILITY_NAMED_IAM
+
 workflows:
   default:
     jobs:
