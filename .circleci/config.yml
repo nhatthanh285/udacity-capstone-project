@@ -72,11 +72,11 @@ jobs:
             docker image ls
       - run:
           name: Upload Docker image to Dockerhub
-          command:
+          command: |
             export DOCKER_PATH=$DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
             docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
             docker tag $DOCKER_IMAGE_NAME $DOCKER_PATH
-            docker push DOCKER_PATH
+            docker push $DOCKER_PATH
 
   deploy-infrastructure:
     docker:
