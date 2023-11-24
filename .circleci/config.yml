@@ -74,9 +74,9 @@ jobs:
           name: Upload Docker image to Dockerhub
           command:
             echo "Upload image $DOCKER_IMAGE_NAME to Dockerhub"
-            docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
-            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
-            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+            docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+            docker tag $DOCKER_IMAGE_NAME $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
+            docker push $DOCKER_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
 
   deploy-infrastructure:
     docker:
@@ -173,11 +173,59 @@ jobs:
             cat ~/project/ansible/inventory.txt
             ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-server.yml
 
+  configure-cluster:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_ansible
+      - install-kubectl
+      - add_ssh_keys:
+          fingerprints: [fe:98:81:45:ca:bc:c4:99:3a:37:3e:e9:7c:54:fa:9e]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Configure server
+          command: |        
+            cat ~/project/ansible/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-cluster.yml
+      - run:
+          name: Wait for LoadBalancer's domain to become reachable
+          command: |
+            cat ~/project/ansible/inventory.txt
+            echo "Wait 60 seconds..."
+            sleep 60
+      - run:
+          name: Display the LoadBalancer's DNS name
+          command: |
+            cat ~/project/ansible/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/save-elb-dns.yml
+            cat ~/project/ansible/elb_dns.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/ansible/elb_dns.txt
+
 
 workflows:
   default:
     jobs:
       - test-build
-      - docker-build-and-upload-to-dockerhub
-      - deploy-infrastructure
-      - configure-infrastructure
+      - docker-build-and-upload-to-dockerhub:
+          filters:
+            branches:
+              only: [ master ]
+      - deploy-infrastructure:
+          filters:
+            branches:
+              only: [ master ]
+      - configure-infrastructure:
+          requires:
+            - deploy-infrastructure
+      - configure-cluster:
+          requires:
+            - configure-infrastructure
+            - docker-build-and-upload-to-dockerhub
