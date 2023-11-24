@@ -22,7 +22,7 @@ jobs:
             source ~/.devops/bin/activate
             make lint
 
-  docker-build:
+  docker-build-and-upload-to-dockerhub:
     docker:
       - image: circleci/golang:1.15
     working_directory: ~/repo
@@ -40,12 +40,31 @@ jobs:
       - run:
           name: Upload Docker image to Dockerhub
           command:
-            echo $DOCKER_IMAGE_NAME
+            echo "Upload image $DOCKER_IMAGE_NAME to Dockerhub"
+            docker login -u="$DOCKERHUB_USERNAME" -p="$DOCKERHUB_PASSWORD"
+            docker tag $DOCKER_IMAGE_NAME $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$
+            docker push $DOCKERHUB_USERNAME/$DOCKER_IMAGE_NAME:$CIRCLE_WORKFLOW_ID
 
-
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yum install -y tar gzip
+      - run:
+          name: Ensure EKS network exists
+          command: |
+            aws cloudformation deploy \
+              --template-file cloudformation/network.yml \
+              --tags project=${ENVIRONMENT_NAME}-project \
+              --stack-name "${ENVIRONMENT_NAME}-eks-network" \
+              --region ${AWS_DEFAULT_REGION} \
+              --parameter-overrides file://cloudformation/network-params.json
 
 workflows:
   default:
     jobs:
       - test-build
-      - docker-build
+      - docker-build-and-upload-to-dockerhub
