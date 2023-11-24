@@ -99,6 +99,11 @@ jobs:
               --output text >> ~/project/ansible/checkIfDeployed.txt
             cat ~/project/ansible/checkIfDeployed.txt
 
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/ansible/checkIfDeployed.txt
+
 workflows:
   default:
     jobs:
