@@ -209,7 +209,7 @@ jobs:
           paths:
             - project/ansible/elb_dns.txt
 
-    deploy-docker:
+  deploy-docker:
     docker:
       - image: cimg/base:stable
     steps:
@@ -248,4 +248,7 @@ workflows:
           requires:
             - configure-infrastructure
             - docker-build-and-upload-to-dockerhub
+      - deploy-docker:
+            requires:
+              - configure-cluster
       
