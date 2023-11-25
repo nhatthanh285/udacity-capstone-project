@@ -6,7 +6,7 @@ Description: >
 Parameters:
   EnvironmentName:
     Description: Environment name
-    Default: CapstoneProject
+    Default: capstone-project
     Type: String
 
   VpcCIDR:
