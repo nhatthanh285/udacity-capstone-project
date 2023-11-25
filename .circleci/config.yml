@@ -171,7 +171,7 @@ jobs:
               --filters "Name=tag:Name,Values=${ENVIRONMENT_NAME}-management*" \
               --output text >> ~/project/ansible/inventory.txt
             cat ~/project/ansible/inventory.txt
-            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-server.yml
+            ansible-playbook -i ~/project/ansible/inventory.txt -v ~/project/ansible/configure-server.yml
 
   configure-cluster:
     docker:
@@ -190,7 +190,7 @@ jobs:
           command: |        
             cat ~/project/ansible/inventory.txt
             cd ansible
-            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-cluster.yml
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-cluster.yml -v
       - run:
           name: Wait for LoadBalancer's domain to become reachable
           command: |
@@ -202,7 +202,7 @@ jobs:
           command: |
             cat ~/project/ansible/inventory.txt
             cd ansible
-            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/save-elb-dns.yml
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/save-elb-dns.yml -v
             cat ~/project/ansible/elb_dns.txt
       - persist_to_workspace:
           root: ~/
@@ -225,7 +225,7 @@ jobs:
           command: |
             cat ~/project/ansible/inventory.txt
             cd ansible
-            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/deploy-app.yml
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/deploy-app.yml -v
           no_output_timeout: 2m
 
 
