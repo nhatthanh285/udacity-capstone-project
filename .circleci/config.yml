@@ -209,6 +209,25 @@ jobs:
           paths:
             - project/ansible/elb_dns.txt
 
+    deploy-docker:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_ansible
+      - add_ssh_keys:
+          fingerprints: [31:30:44:3f:d4:92:b1:68:4f:0d:a9:66:b4:ec:40:5a]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Deploy newest Docker Image
+          command: |
+            cat ~/project/ansible/inventory.txt
+            cd ansible
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/deploy-app.yml
+          no_output_timeout: 2m
+
 
 workflows:
   default:
