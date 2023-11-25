@@ -190,7 +190,7 @@ jobs:
           command: |        
             cat ~/project/ansible/inventory.txt
             cd ansible
-            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-cluster.yml -v
+            ansible-playbook -i ~/project/ansible/inventory.txt ~/project/ansible/configure-cluster.yml
       - run:
           name: Wait for LoadBalancer's domain to become reachable
           command: |

@@ -11,3 +11,7 @@
       shell: "./bin/kubectl set image deployments/{{ ENVIRONMENT_NAME }} {{ ENVIRONMENT_NAME }}=thanhtran285/{{ ENVIRONMENT_NAME }}:{{ CIRCLE_WORKFLOW_ID }}"
       args:
         chdir: $HOME
+      register: command_output
+
+    - debug:
+        var: command_output.stdout_lines
